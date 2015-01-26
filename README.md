@@ -7,7 +7,7 @@ This project is based of off EventSource-Java:
 https://github.com/aslakhellesoy/eventsource-java
 https://github.com/TomMettam/eventsource-java
 
-One addion made to the original source, is that headers can now be passed in for including authorization tokens, etc in the request.
+One addition made to the original source is that headers can now be passed in the method to include authorization tokens, etc in the request.
 
 Note:
 In order to use eventsource, you must create and connect the event source from a separate thread.
