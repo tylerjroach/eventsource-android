@@ -20,7 +20,7 @@ Example implementation:
             @Override
             public void run() {
                 try {
-                    eventSource = new EventSource(Uri, new SSEHandler(), extraHeaderParameters);
+                    eventSource = new EventSource(Uri, new SSEHandler(), extraHeaderParameters, true);
                     eventSource.connect();
                 } catch(URISyntaxException e) {
                     Log.v("Error starting eventsource", "True");
@@ -50,6 +50,7 @@ Example implementation:
 
         @Override
         public void onComment(String comment) {
+           //comments only received if exposeComments turned on
            Log.v("SSE Comment", comment);
         }
 
