@@ -10,7 +10,7 @@ https://github.com/TomMettam/eventsource-java
 One addition made to the original source is that headers can now be passed in the method to include authorization tokens, etc in the request.
 
 Note:
-In order to use eventsource, you must create and connect the event source from a separate thread.
+In order to use eventsource, you must create and connect the event source from a separate thread. If you are planning to update a view's ui from the handler, you will need to use runOnUI or create a handler tied to the main thread.
 
 I've packaged the code into an android library. Just assembleRelease in gradle to create the neccessary AAR file. In the near future, I will upload the library to jcenter.
 
