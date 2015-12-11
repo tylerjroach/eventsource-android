@@ -43,6 +43,10 @@ public class StubHandler implements ConnectionHandler, EventSourceHandler {
     }
 
     @Override
+    //leaving unimplemented. Don't want to store comments as they could get out of hand
+    public void onComment(String comment) {}
+
+    @Override
     public void onError(Throwable t) {
         errors.add(t);
     }

@@ -47,7 +47,12 @@ Example implementation:
             Log.v("SSE Message: ", message.lastEventId);
             Log.v("SSE Message: ", message.data);
         }
-        
+
+        @Override
+        public void onComment(String comment) {
+           Log.v("SSE Comment", comment);
+        }
+
         @Override
         public void onError(Throwable t) {
             Log.v("SSE Error", "True");

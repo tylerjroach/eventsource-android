@@ -8,10 +8,12 @@ import tylerjroach.com.eventsource_android.MessageEvent;
 public class AsyncEventSourceHandler implements EventSourceHandler {
     private final Executor executor;
     private final EventSourceHandler eventSourceHandler;
+    private boolean exposeComments;
 
-    public AsyncEventSourceHandler(Executor executor, EventSourceHandler eventSourceHandler) {
+    public AsyncEventSourceHandler(Executor executor, EventSourceHandler eventSourceHandler, boolean exposeComments) {
         this.executor = executor;
         this.eventSourceHandler = eventSourceHandler;
+        this.exposeComments = exposeComments;
     }
 
     @Override
@@ -55,6 +57,21 @@ public class AsyncEventSourceHandler implements EventSourceHandler {
                 }
             }
         });
+    }
+
+    @Override
+    public void onComment(final String comment) {
+        if (exposeComments) {
+            executor.execute(new Runnable() {
+                @Override public void run() {
+                    try {
+                        eventSourceHandler.onComment(comment);
+                    } catch (Exception e) {
+                        onError(e);
+                    }
+                }
+            });
+        }
     }
 
     @Override

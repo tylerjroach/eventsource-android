@@ -30,6 +30,8 @@ public class EventSource implements EventSourceHandler {
     public static final int OPEN = 1;
     public static final int CLOSED = 2;
 
+    private boolean exposeComments = false;
+
     private final ClientBootstrap bootstrap;
     private final EventSourceChannelHandler clientHandler;
     private final EventSourceHandler eventSourceHandler;
@@ -52,13 +54,16 @@ public class EventSource implements EventSourceHandler {
      * @param headers Map of additional headers, such as passing auth tokens
      * @see #close()
      */
-    public EventSource(Executor executor, long reconnectionTimeMillis, final URI pURI, EventSourceHandler eventSourceHandler, Map<String, String> headers) {
-        this(executor, reconnectionTimeMillis, pURI, null, eventSourceHandler, headers);
+    public EventSource(Executor executor, long reconnectionTimeMillis, final URI pURI, EventSourceHandler eventSourceHandler, Map<String, String> headers, boolean exposeComments) {
+        this(executor, reconnectionTimeMillis, pURI, null, eventSourceHandler, headers, exposeComments);
     }
 
-    public EventSource(Executor executor, long reconnectionTimeMillis, final URI pURI, SSLEngineFactory fSSLEngine, EventSourceHandler eventSourceHandler, Map<String, String> headers) {
+    public EventSource(Executor executor, long reconnectionTimeMillis, final URI pURI, SSLEngineFactory fSSLEngine, EventSourceHandler eventSourceHandler, Map<String, String> headers, Boolean expose) {
         this.eventSourceHandler = eventSourceHandler;
-        
+
+        if (expose != null) {
+            this.exposeComments = expose;
+        }
 
         bootstrap = new ClientBootstrap(
                 new NioClientSocketChannelFactory(
@@ -81,7 +86,7 @@ public class EventSource implements EventSourceHandler {
         bootstrap.setOption("remoteAddress", new InetSocketAddress(uri.getHost(), port));
 
         // add this class as the event source handler so the connect() call can be intercepted
-        AsyncEventSourceHandler asyncHandler = new AsyncEventSourceHandler(executor, this);
+        AsyncEventSourceHandler asyncHandler = new AsyncEventSourceHandler(executor, this, exposeComments);
 
         clientHandler = new EventSourceChannelHandler(asyncHandler, reconnectionTimeMillis, bootstrap, uri, headers);
 
@@ -105,30 +110,30 @@ public class EventSource implements EventSourceHandler {
         });
     }
 
-    public EventSource(String uri, EventSourceHandler eventSourceHandler) {
-        this(uri, null, eventSourceHandler);
+    public EventSource(String uri, EventSourceHandler eventSourceHandler, boolean exposeComments) {
+        this(uri, null, eventSourceHandler, exposeComments);
     }
 
-    public EventSource(String uri, SSLEngineFactory sslEngineFactory, EventSourceHandler eventSourceHandler) {
-        this(URI.create(uri), sslEngineFactory, eventSourceHandler);
+    public EventSource(String uri, SSLEngineFactory sslEngineFactory, EventSourceHandler eventSourceHandler, boolean exposeComments) {
+        this(URI.create(uri), sslEngineFactory, eventSourceHandler, exposeComments);
     }
 
-    public EventSource(URI uri, EventSourceHandler eventSourceHandler) {
-        this(uri, null, eventSourceHandler);
+    public EventSource(URI uri, EventSourceHandler eventSourceHandler, boolean exposeComments) {
+        this(uri, null, eventSourceHandler, exposeComments);
     }
 
-    public EventSource(URI uri, EventSourceHandler eventSourceHandler, Map<String, String> headers) {
-        this(uri, null, eventSourceHandler, headers);
+    public EventSource(URI uri, EventSourceHandler eventSourceHandler, Map<String, String> headers, boolean exposeComments) {
+        this(uri, null, eventSourceHandler, headers, exposeComments);
     }
 
 
 
-    public EventSource(URI uri, SSLEngineFactory sslEngineFactory, EventSourceHandler eventSourceHandler) {
-        this(Executors.newSingleThreadExecutor(), DEFAULT_RECONNECTION_TIME_MILLIS, uri, sslEngineFactory, eventSourceHandler, null);
+    public EventSource(URI uri, SSLEngineFactory sslEngineFactory, EventSourceHandler eventSourceHandler, boolean exposeComments) {
+        this(Executors.newSingleThreadExecutor(), DEFAULT_RECONNECTION_TIME_MILLIS, uri, sslEngineFactory, eventSourceHandler, null, exposeComments);
     }
 
-    public EventSource(URI uri, SSLEngineFactory sslEngineFactory, EventSourceHandler eventSourceHandler, Map<String, String> headers) {
-        this(Executors.newSingleThreadExecutor(), DEFAULT_RECONNECTION_TIME_MILLIS, uri, sslEngineFactory, eventSourceHandler, headers);
+    public EventSource(URI uri, SSLEngineFactory sslEngineFactory, EventSourceHandler eventSourceHandler, Map<String, String> headers, boolean exposeComments) {
+        this(Executors.newSingleThreadExecutor(), DEFAULT_RECONNECTION_TIME_MILLIS, uri, sslEngineFactory, eventSourceHandler, headers, exposeComments);
     }
 
     public ChannelFuture connect() {
@@ -183,6 +188,12 @@ public class EventSource implements EventSourceHandler {
     public void onMessage(String event, MessageEvent message) throws Exception {
         // pass event to the proper handler
         eventSourceHandler.onMessage(event, message);
+    }
+
+    @Override
+    public void onComment(String comment) throws Exception {
+        // pass event to the proper handler
+        eventSourceHandler.onComment(comment);
     }
 
     @Override
