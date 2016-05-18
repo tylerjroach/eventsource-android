@@ -34,7 +34,7 @@ public class EventSourceChannelHandler extends SimpleChannelUpstreamHandler
     implements ConnectionHandler {
   private static final Pattern STATUS_PATTERN = Pattern.compile("HTTP/1.1 (\\d+) (.*)");
   private static final Pattern CONTENT_TYPE_PATTERN =
-      Pattern.compile("Content-Type: text/event-stream");
+      Pattern.compile("Content-Type: text/event-stream", Pattern.CASE_INSENSITIVE);
 
   private final EventSourceHandler eventSourceHandler;
   private final ClientBootstrap bootstrap;
@@ -121,7 +121,7 @@ public class EventSourceChannelHandler extends SimpleChannelUpstreamHandler
       }
     }
     if (!headerDone) {
-      if (CONTENT_TYPE_PATTERN.matcher(line).matches()) {
+      if (CONTENT_TYPE_PATTERN.matcher(line).find()) {
         eventStreamOk = true;
       }
       if (line.isEmpty()) {
