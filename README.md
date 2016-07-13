@@ -70,3 +70,8 @@ Example implementation:
         }
         
 To stop event source, make sure to run eventSource.close(), as well as remove the handler and thread instance.
+
+
+I'm currently working on a rewrite to remove Netty in favor of OkHttp, as well as using a reactive approach
+
+If you have a pull request, please follow square-android style guides found here: https://github.com/square/java-code-styles
