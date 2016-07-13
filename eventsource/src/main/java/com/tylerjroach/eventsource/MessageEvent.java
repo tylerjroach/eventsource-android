@@ -1,4 +1,4 @@
-package tylerjroach.com.eventsource_android;
+package com.tylerjroach.eventsource;
 
 public class MessageEvent {
   public final String data;

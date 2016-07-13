@@ -1,4 +1,4 @@
-package tylerjroach.com.eventsource_android;
+package com.tylerjroach.eventsource;
 
 public interface EventSourceHandler {
   void onConnect() throws Exception;

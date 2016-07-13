@@ -1,4 +1,4 @@
-package tylerjroach.com.eventsource_android;
+package com.tylerjroach.eventsource;
 
 public class EventSourceException extends RuntimeException {
   public EventSourceException(String message, Throwable cause) {

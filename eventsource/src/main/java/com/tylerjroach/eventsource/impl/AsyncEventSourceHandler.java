@@ -1,8 +1,8 @@
-package tylerjroach.com.eventsource_android.impl;
+package com.tylerjroach.eventsource.impl;
 
+import com.tylerjroach.eventsource.EventSourceHandler;
+import com.tylerjroach.eventsource.MessageEvent;
 import java.util.concurrent.Executor;
-import tylerjroach.com.eventsource_android.EventSourceHandler;
-import tylerjroach.com.eventsource_android.MessageEvent;
 
 public class AsyncEventSourceHandler implements EventSourceHandler {
   private final Executor executor;

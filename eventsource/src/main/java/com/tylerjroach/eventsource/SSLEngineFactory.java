@@ -1,4 +1,4 @@
-package tylerjroach.com.eventsource_android;
+package com.tylerjroach.eventsource;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;

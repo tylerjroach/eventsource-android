@@ -1,8 +1,8 @@
-package tylerjroach.com.eventsource_android.impl;
+package com.tylerjroach.eventsource.impl;
 
+import com.tylerjroach.eventsource.EventSourceHandler;
+import com.tylerjroach.eventsource.MessageEvent;
 import java.util.regex.Pattern;
-import tylerjroach.com.eventsource_android.EventSourceHandler;
-import tylerjroach.com.eventsource_android.MessageEvent;
 
 /**
  * <a href="http://dev.w3.org/html5/eventsource/#event-stream-interpretation">Interprets an event

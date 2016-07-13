@@ -1,5 +1,7 @@
-package tylerjroach.com.eventsource_android;
+package com.tylerjroach.eventsource;
 
+import com.tylerjroach.eventsource.impl.AsyncEventSourceHandler;
+import com.tylerjroach.eventsource.impl.netty.EventSourceChannelHandler;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Map;
@@ -17,8 +19,6 @@ import org.jboss.netty.handler.codec.frame.Delimiters;
 import org.jboss.netty.handler.codec.http.HttpRequestEncoder;
 import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.ssl.SslHandler;
-import tylerjroach.com.eventsource_android.impl.AsyncEventSourceHandler;
-import tylerjroach.com.eventsource_android.impl.netty.EventSourceChannelHandler;
 
 public class EventSource implements EventSourceHandler {
   public static final long DEFAULT_RECONNECTION_TIME_MILLIS = 2000;
@@ -38,7 +38,7 @@ public class EventSource implements EventSourceHandler {
    * Creates a new <a href="http://dev.w3.org/html5/eventsource/">EventSource</a> client. The client
    * will reconnect on
    * lost connections automatically, unless the connection is closed explicitly by a call to
-   * {@link tylerjroach.com.eventsource_android.EventSource#close()}.
+   * {@link com.tylerjroach.eventsource.EventSource#close()}.
    *
    * For sample usage, see examples at <a href="https://github.com/aslakhellesoy/eventsource-java/tree/master/src/test/java/com/github/eventsource/client">GitHub</a>.
    *

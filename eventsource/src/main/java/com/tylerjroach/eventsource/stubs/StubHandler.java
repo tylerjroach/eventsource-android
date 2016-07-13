@@ -1,13 +1,13 @@
-package tylerjroach.com.eventsource_android.stubs;
+package com.tylerjroach.eventsource.stubs;
 
+import com.tylerjroach.eventsource.EventSourceHandler;
+import com.tylerjroach.eventsource.MessageEvent;
+import com.tylerjroach.eventsource.impl.ConnectionHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import tylerjroach.com.eventsource_android.EventSourceHandler;
-import tylerjroach.com.eventsource_android.MessageEvent;
-import tylerjroach.com.eventsource_android.impl.ConnectionHandler;
 
 public class StubHandler implements ConnectionHandler, EventSourceHandler {
   private Long reconnectionTimeMillis;

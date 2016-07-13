@@ -1,1 +1,1 @@
-include ':eventsource_android'
+include ':eventsource'

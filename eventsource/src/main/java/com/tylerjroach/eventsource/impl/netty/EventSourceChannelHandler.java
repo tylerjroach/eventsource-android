@@ -1,5 +1,9 @@
-package tylerjroach.com.eventsource_android.impl.netty;
+package com.tylerjroach.eventsource.impl.netty;
 
+import com.tylerjroach.eventsource.impl.ConnectionHandler;
+import com.tylerjroach.eventsource.EventSourceException;
+import com.tylerjroach.eventsource.EventSourceHandler;
+import com.tylerjroach.eventsource.impl.EventStreamParser;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -25,10 +29,6 @@ import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timeout;
 import org.jboss.netty.util.Timer;
 import org.jboss.netty.util.TimerTask;
-import tylerjroach.com.eventsource_android.EventSourceException;
-import tylerjroach.com.eventsource_android.EventSourceHandler;
-import tylerjroach.com.eventsource_android.impl.ConnectionHandler;
-import tylerjroach.com.eventsource_android.impl.EventStreamParser;
 
 public class EventSourceChannelHandler extends SimpleChannelUpstreamHandler
     implements ConnectionHandler {

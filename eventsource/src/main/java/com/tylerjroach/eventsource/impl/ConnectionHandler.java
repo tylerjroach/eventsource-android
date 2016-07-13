@@ -1,4 +1,4 @@
-package tylerjroach.com.eventsource_android.impl;
+package com.tylerjroach.eventsource.impl;
 
 public interface ConnectionHandler {
   void setReconnectionTimeMillis(long reconnectionTimeMillis);
