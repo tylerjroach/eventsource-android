@@ -3,6 +3,10 @@
 An Android EventSource (SSE) Library
 This is a Java implementation of the EventSource - a client for Server-Sent Events. The implementation is based on Netty
 
+jCenter Gradle import
+
+    compile 'com.tylerjroach:eventsource:1.1.0'
+
 This project is based of off EventSource-Java:
 https://github.com/aslakhellesoy/eventsource-java
 https://github.com/TomMettam/eventsource-java
