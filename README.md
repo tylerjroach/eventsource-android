@@ -5,10 +5,27 @@ An Android EventSource (SSE - Server Sent Events) Library
 jCenter Gradle import
 
     compile 'com.tylerjroach:eventsource:1.2.1'
-
-Example implementation:
     
-    private SSEHandler sseHandler;
+## What's new (1.2.1)
+* Removed need to create event source in background thread, now done automatically
+* First official jcenter release
+* Executor fix
+
+1.2.0
+* Breaking: EventSource is now created using a Builder
+
+1.1.0
+* Fixed content type issue
+ 
+## Future Plans
+* Replace Netty with Okhttp
+* Use rx observables over SSEHandler
+* Ability to choose thread for callbacks to return
+
+
+##Example implementation:
+    
+    private SSEHandler sseHandler = new SSEHandler();
     
     private void startEventSource() {
         eventSource = new EventSource.Builder(new URI(eventUrl))
@@ -19,7 +36,7 @@ Example implementation:
     }
            
     private void stopEventSource() {
-        if (eventsource!= null)
+        if (eventsource != null)
             eventSource.close();
         sseHandler = null;
     }
@@ -31,8 +48,7 @@ Example implementation:
 
     private class SSEHandler implements EventSourceHandler {
 
-        public SSEHandler() {
-        }
+        public SSEHandler() {}
         
         @Override
         public void onConnect() {
@@ -64,10 +80,7 @@ Example implementation:
         
 To stop event source, make sure to run eventSource.close()
 
-
-I'm currently working on a rewrite to remove Netty in favor of OkHttp, as well as using a reactive approach
 If you have a pull request, please follow square-android style guides found here: https://github.com/square/java-code-styles
-
 
 This project is based of off EventSource-Java:
 https://github.com/aslakhellesoy/eventsource-java
