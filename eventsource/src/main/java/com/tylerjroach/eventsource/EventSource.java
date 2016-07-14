@@ -10,7 +10,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import javax.net.ssl.SSLEngine;
 import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
@@ -33,15 +32,19 @@ public class EventSource implements EventSourceHandler {
   private URI uri;
   private final EventSourceHandler eventSourceHandler;
   private int readyState;
+  private Executor executor;
 
   private EventSource(Builder builder) {
     this.uri = builder.uri;
     this.eventSourceHandler = builder.eventSourceHandler;
     boolean exposeComments = builder.exposeComments;
     long reconnectInterval = builder.reconnectInterval;
-    Executor executor = builder.executor;
+    this.executor = builder.executor;
     Map<String, String> headers = builder.headers;
     SSLEngineFactory sslEngineFactory = builder.sslEngineFactory;
+
+    if (executor == null)
+      this.executor = Executors.newSingleThreadExecutor();
 
     if (eventSourceHandler == null)
       Log.d(TAG, "No handler attached");
@@ -56,12 +59,6 @@ public class EventSource implements EventSourceHandler {
       sslEngineFactory = null;
     }
     final SSLEngineFactory SSLFactory = sslEngineFactory;
-
-    int port = uri.getPort();
-    if (port == -1) {
-      port = (uri.getScheme().equals("https")) ? 443 : 80;
-    }
-    bootstrap.setOption("remoteAddress", new InetSocketAddress(uri.getHost(), port));
 
     // add this class as the event source handler so the connect() call can be intercepted
     AsyncEventSourceHandler asyncHandler =
@@ -147,7 +144,7 @@ public class EventSource implements EventSourceHandler {
     }
 
     /**
-     * @param executor the executor that will receive events
+     * @param executor the executor that will connect and receive events
      */
     public Builder executor(Executor executor) {
       this.executor = executor;
@@ -171,16 +168,22 @@ public class EventSource implements EventSourceHandler {
     }
   }
 
-  public ChannelFuture connect() {
+  public void connect() {
     readyState = CONNECTING;
 
     //To avoid perpetual "SocketUnresolvedException"
-    int port = uri.getPort();
-    if (port == -1) {
+    final int port;
+    if (uri.getPort() == -1) {
       port = (uri.getScheme().equals("https")) ? 443 : 80;
+    } else {
+      port = uri.getPort();
     }
-    bootstrap.setOption("remoteAddress", new InetSocketAddress(uri.getHost(), port));
-    return bootstrap.connect();
+
+    executor.execute(new Runnable() {
+      @Override public void run() {
+        bootstrap.connect(new InetSocketAddress(uri.getHost(), port));
+      }
+    });
   }
 
   public boolean isConnected() {
