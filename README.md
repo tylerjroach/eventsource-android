@@ -4,7 +4,7 @@ An Android EventSource (SSE - Server Sent Events) Library
 
 jCenter Gradle import
 
-    compile 'com.tylerjroach:eventsource:1.2.1'
+    compile 'com.tylerjroach:eventsource:1.2.11'
     
 ## What's new (1.2.11)
 * Removed need to create event source in background thread, now done automatically
@@ -29,7 +29,7 @@ jCenter Gradle import
     private SSEHandler sseHandler = new SSEHandler();
     
     private void startEventSource() {
-        eventSource = new EventSource.Builder(new URI(eventUrl))
+        eventSource = new EventSource.Builder(eventUrl)
             .eventHandler(sseHandler)
             .headers(extraHeaderParameters)
             .build();
