@@ -6,10 +6,11 @@ jCenter Gradle import
 
     compile 'com.tylerjroach:eventsource:1.2.1'
     
-## What's new (1.2.1)
+## What's new (1.2.11)
 * Removed need to create event source in background thread, now done automatically
 * First official jcenter release
 * Executor fix
+* Add ability to pass String url instead of URI to builder
 
 1.2.0
 * Breaking: EventSource is now created using a Builder
