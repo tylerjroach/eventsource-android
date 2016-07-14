@@ -22,7 +22,10 @@ Example implementation:
             @Override
             public void run() {
                 try {
-                    eventSource = new EventSource(Uri, new SSEHandler(), extraHeaderParameters, true);
+                    eventSource = new EventSource.Builder(new URI(eventUrl))
+                        .eventHandler(new SSEHandler())
+                        .headers(extraHeaderParameters)
+                        .build();
                     eventSource.connect();
                 } catch(URISyntaxException e) {
                     Log.v("Error starting eventsource", "True");

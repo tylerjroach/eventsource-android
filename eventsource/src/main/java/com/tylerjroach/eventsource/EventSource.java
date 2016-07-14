@@ -1,5 +1,6 @@
 package com.tylerjroach.eventsource;
 
+import android.util.Log;
 import com.tylerjroach.eventsource.impl.AsyncEventSourceHandler;
 import com.tylerjroach.eventsource.impl.netty.EventSourceChannelHandler;
 import java.net.InetSocketAddress;
@@ -21,6 +22,7 @@ import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.ssl.SslHandler;
 
 public class EventSource implements EventSourceHandler {
+  public static final String TAG = "EventSource";
   public static final long DEFAULT_RECONNECTION_TIME_MILLIS = 2000;
 
   public static final int CONNECTING = 0;
@@ -28,54 +30,33 @@ public class EventSource implements EventSourceHandler {
   public static final int CLOSED = 2;
   private final ClientBootstrap bootstrap;
   private final EventSourceChannelHandler clientHandler;
-  private final EventSourceHandler eventSourceHandler;
-  private boolean exposeComments = false;
   private URI uri;
-  private Map<String, String> headers;
+  private final EventSourceHandler eventSourceHandler;
   private int readyState;
 
-  /**
-   * Creates a new <a href="http://dev.w3.org/html5/eventsource/">EventSource</a> client. The client
-   * will reconnect on
-   * lost connections automatically, unless the connection is closed explicitly by a call to
-   * {@link com.tylerjroach.eventsource.EventSource#close()}.
-   *
-   * For sample usage, see examples at <a href="https://github.com/aslakhellesoy/eventsource-java/tree/master/src/test/java/com/github/eventsource/client">GitHub</a>.
-   *
-   * @param executor the executor that will receive events
-   * @param reconnectionTimeMillis delay before a reconnect is made - in the event of a lost
-   * connection
-   * @param pURI where to connect
-   * @param eventSourceHandler receives events
-   * @param headers Map of additional headers, such as passing auth tokens
-   * @see #close()
-   */
-  public EventSource(Executor executor, long reconnectionTimeMillis, final URI pURI,
-      EventSourceHandler eventSourceHandler, Map<String, String> headers, boolean exposeComments) {
-    this(executor, reconnectionTimeMillis, pURI, null, eventSourceHandler, headers, exposeComments);
-  }
+  private EventSource(Builder builder) {
+    this.uri = builder.uri;
+    this.eventSourceHandler = builder.eventSourceHandler;
+    boolean exposeComments = builder.exposeComments;
+    long reconnectInterval = builder.reconnectInterval;
+    Executor executor = builder.executor;
+    Map<String, String> headers = builder.headers;
+    SSLEngineFactory sslEngineFactory = builder.sslEngineFactory;
 
-  public EventSource(Executor executor, long reconnectionTimeMillis, final URI pURI,
-      SSLEngineFactory fSSLEngine, EventSourceHandler eventSourceHandler,
-      Map<String, String> headers, Boolean expose) {
-    this.eventSourceHandler = eventSourceHandler;
-
-    if (expose != null) {
-      this.exposeComments = expose;
-    }
+    if (eventSourceHandler == null)
+      Log.d(TAG, "No handler attached");
 
     bootstrap = new ClientBootstrap(
         new NioClientSocketChannelFactory(Executors.newSingleThreadExecutor(),
             Executors.newSingleThreadExecutor()));
-    if (pURI.getScheme().equals("https") && fSSLEngine == null) {
-      fSSLEngine = new SSLEngineFactory();
+    if (uri.getScheme().equals("https") && sslEngineFactory == null) {
+      sslEngineFactory = new SSLEngineFactory();
     } else {
       //If we don't do this then the pipeline still attempts to use SSL
-      fSSLEngine = null;
+      sslEngineFactory = null;
     }
-    final SSLEngineFactory SSLFactory = fSSLEngine;
+    final SSLEngineFactory SSLFactory = sslEngineFactory;
 
-    uri = pURI;
     int port = uri.getPort();
     if (port == -1) {
       port = (uri.getScheme().equals("https")) ? 443 : 80;
@@ -87,7 +68,7 @@ public class EventSource implements EventSourceHandler {
         new AsyncEventSourceHandler(executor, this, exposeComments);
 
     clientHandler =
-        new EventSourceChannelHandler(asyncHandler, reconnectionTimeMillis, bootstrap, uri,
+        new EventSourceChannelHandler(asyncHandler, reconnectInterval, bootstrap, uri,
             headers);
 
     bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
@@ -111,34 +92,83 @@ public class EventSource implements EventSourceHandler {
     });
   }
 
-  public EventSource(String uri, EventSourceHandler eventSourceHandler, boolean exposeComments) {
-    this(uri, null, eventSourceHandler, exposeComments);
-  }
+  /**
+   * Builder used to build EventSource
+   */
 
-  public EventSource(String uri, SSLEngineFactory sslEngineFactory,
-      EventSourceHandler eventSourceHandler, boolean exposeComments) {
-    this(URI.create(uri), sslEngineFactory, eventSourceHandler, exposeComments);
-  }
+  public static final class Builder {
+    private long reconnectInterval = DEFAULT_RECONNECTION_TIME_MILLIS;
+    private URI uri;
+    private boolean exposeComments;
+    private Map<String, String> headers;
+    private SSLEngineFactory sslEngineFactory;
+    private Executor executor;
+    private EventSourceHandler eventSourceHandler;
 
-  public EventSource(URI uri, EventSourceHandler eventSourceHandler, boolean exposeComments) {
-    this(uri, null, eventSourceHandler, exposeComments);
-  }
+    /**
+     * @param uri to connect
+     */
+    public Builder(URI uri) {
+      this.uri = uri;
+    }
 
-  public EventSource(URI uri, EventSourceHandler eventSourceHandler, Map<String, String> headers,
-      boolean exposeComments) {
-    this(uri, null, eventSourceHandler, headers, exposeComments);
-  }
+    /**
+     * @param reconnectInterval delay (in milliseconds) before a reconnect is made - in the event of a lost
+     */
 
-  public EventSource(URI uri, SSLEngineFactory sslEngineFactory,
-      EventSourceHandler eventSourceHandler, boolean exposeComments) {
-    this(Executors.newSingleThreadExecutor(), DEFAULT_RECONNECTION_TIME_MILLIS, uri,
-        sslEngineFactory, eventSourceHandler, null, exposeComments);
-  }
+    public Builder reconnectInterval(long reconnectInterval) {
+      this.reconnectInterval = reconnectInterval;
+      return this;
+    }
 
-  public EventSource(URI uri, SSLEngineFactory sslEngineFactory,
-      EventSourceHandler eventSourceHandler, Map<String, String> headers, boolean exposeComments) {
-    this(Executors.newSingleThreadExecutor(), DEFAULT_RECONNECTION_TIME_MILLIS, uri,
-        sslEngineFactory, eventSourceHandler, headers, exposeComments);
+    /**
+     * @param exposeComments Pass comments through handler
+     */
+    public Builder exposeComments(boolean exposeComments) {
+      this.exposeComments = exposeComments;
+      return this;
+    }
+
+    /**
+     * @param headers Map of headers to pass
+     */
+    public Builder headers(Map<String, String> headers) {
+      this.headers = headers;
+      return this;
+    }
+
+    /**
+     * @param sslEngineFactory custom factory
+     */
+
+    public Builder sslEngineFactory(SSLEngineFactory sslEngineFactory) {
+      this.sslEngineFactory = sslEngineFactory;
+      return this;
+    }
+
+    /**
+     * @param executor the executor that will receive events
+     */
+    public Builder executor(Executor executor) {
+      this.executor = executor;
+      return this;
+    }
+
+    /**
+     * @param eventSourceHandler receives events
+     */
+    public Builder eventHandler(EventSourceHandler eventSourceHandler) {
+      this.eventSourceHandler = eventSourceHandler;
+      return this;
+    }
+
+    /**
+     * @return new EventSource
+     */
+
+    public EventSource build() {
+      return new EventSource(this);
+    }
   }
 
   public ChannelFuture connect() {
@@ -183,27 +213,27 @@ public class EventSource implements EventSourceHandler {
     // flag the connection as open
     readyState = OPEN;
 
-    // pass event to the proper handler
-    eventSourceHandler.onConnect();
+    if (eventSourceHandler != null)
+      eventSourceHandler.onConnect();
   }
 
   @Override public void onMessage(String event, MessageEvent message) throws Exception {
-    // pass event to the proper handler
-    eventSourceHandler.onMessage(event, message);
+    if (eventSourceHandler != null)
+      eventSourceHandler.onMessage(event, message);
   }
 
   @Override public void onComment(String comment) throws Exception {
-    // pass event to the proper handler
-    eventSourceHandler.onComment(comment);
+    if (eventSourceHandler != null)
+      eventSourceHandler.onComment(comment);
   }
 
   @Override public void onError(Throwable t) {
-    // pass event to the proper handler
-    eventSourceHandler.onError(t);
+    if (eventSourceHandler != null)
+      eventSourceHandler.onError(t);
   }
 
   @Override public void onClosed(boolean willReconnect) {
-    // pass event to the proper handler
-    eventSourceHandler.onClosed(willReconnect);
+    if (eventSourceHandler != null)
+      eventSourceHandler.onClosed(willReconnect);
   }
 }
