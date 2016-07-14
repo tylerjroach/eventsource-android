@@ -5,7 +5,7 @@ This is a Java implementation of the EventSource - a client for Server-Sent Even
 
 jCenter Gradle import
 
-    compile 'com.tylerjroach:eventsource:1.1.0'
+    compile 'com.tylerjroach:eventsource:1.2.0'
 
 This project is based of off EventSource-Java:
 https://github.com/aslakhellesoy/eventsource-java
