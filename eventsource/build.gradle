@@ -10,7 +10,7 @@ android {
     minSdkVersion 16
     targetSdkVersion 23
     versionCode 2
-    versionName "1.2.1"
+    versionName "1.2.11"
   }
   buildTypes {
     release {
@@ -26,7 +26,7 @@ dependencies {
 }
 
 group = 'com.tylerjroach'
-version = '1.2.1'
+version = '1.2.11'
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
@@ -42,7 +42,7 @@ install {
       packaging 'aar'
       groupId 'com.tylerjroach'
       artifactId 'eventsource'
-      version '1.2.1'
+      version '1.2.11'
 
       licenses {
         license {
@@ -76,9 +76,9 @@ bintray {
     licenses = ['Apache-2.0']
     vcsUrl = 'https://github.com/tylerjroach/eventsource-android.git'
     version {
-      name = '1.2.1'
+      name = '1.2.11'
       desc = 'An Android EventSource (SSE) Library'
-      vcsTag = '1.2.1'
+      vcsTag = '1.2.11'
     }
   }
 }

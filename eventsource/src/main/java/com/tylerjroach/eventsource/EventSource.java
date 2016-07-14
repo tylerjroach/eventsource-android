@@ -110,6 +110,14 @@ public class EventSource implements EventSourceHandler {
     }
 
     /**
+     * @param url to connect
+     */
+    public Builder(String url) {
+      this.uri = URI.create(url);
+    }
+
+
+    /**
      * @param reconnectInterval delay (in milliseconds) before a reconnect is made - in the event of a lost
      */
 
