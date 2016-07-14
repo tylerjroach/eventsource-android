@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 /**
  * <a href="http://dev.w3.org/html5/eventsource/#event-stream-interpretation">Interprets an event
  * stream</a>
- * and dispatches messages to the {@link tylerjroach.com.eventsource_android.EventSourceHandler}.
+ * and dispatches messages to the {@link com.tylerjroach.eventsource.EventSourceHandler}.
  */
 public class EventStreamParser {
   private static final String DATA = "data";
