@@ -52,11 +52,11 @@ public class EventSource implements EventSourceHandler {
     bootstrap = new ClientBootstrap(
         new NioClientSocketChannelFactory(Executors.newSingleThreadExecutor(),
             Executors.newSingleThreadExecutor()));
-    if (uri.getScheme().equals("https") && sslEngineFactory == null) {
-      sslEngineFactory = new SSLEngineFactory();
-    } else {
+    if (!uri.getScheme().equals("https")) {
       //If we don't do this then the pipeline still attempts to use SSL
       sslEngineFactory = null;
+    } else if (sslEngineFactory == null) {
+      sslEngineFactory = new SSLEngineFactory();
     }
     final SSLEngineFactory SSLFactory = sslEngineFactory;
 
